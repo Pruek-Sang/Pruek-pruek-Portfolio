@@ -1130,6 +1130,10 @@ a:hover {
     padding: var(--spacing-xl);
 }
 
+.video-modal[hidden] {
+    display: none !important;
+}
+
 .video-modal-overlay {
     position: absolute;
     top: 0;
