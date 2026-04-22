@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initCurrentYear();
     initMediaCards();
     initProjectToggle();
+    initCarousels();
     
     // Add keyboard navigation support
     initKeyboardNavigation();
@@ -540,6 +541,158 @@ function announceToggle(isExpanded, targetId) {
     announcement.textContent = isExpanded 
         ? `Project details expanded` 
         : `Project details collapsed`;
+    
+    document.body.appendChild(announcement);
+    
+    // Remove after announcement
+    setTimeout(() => {
+        document.body.removeChild(announcement);
+    }, 1000);
+}
+
+/**
+ * Carousel Functionality
+ */
+function initCarousels() {
+    const carousels = document.querySelectorAll('.carousel-container');
+    
+    carousels.forEach(carousel => {
+        const track = carousel.querySelector('.carousel-track');
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const prevBtn = carousel.querySelector('.carousel-prev');
+        const nextBtn = carousel.querySelector('.carousel-next');
+        const dots = carousel.querySelectorAll('.carousel-dot');
+        
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+        
+        // Function to update carousel position
+        function updateCarousel() {
+            // Update track position
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            
+            // Update dots
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+                dot.setAttribute('aria-label', `Go to image ${index + 1}`);
+            });
+            
+            // Update slide aria attributes
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+                const img = slide.querySelector('img');
+                if (img) {
+                    if (index === currentSlide) {
+                        img.removeAttribute('aria-hidden');
+                        img.setAttribute('tabindex', '0');
+                    } else {
+                        img.setAttribute('aria-hidden', 'true');
+                        img.setAttribute('tabindex', '-1');
+                    }
+                }
+            });
+            
+            // Announce slide change for screen readers
+            announceSlideChange(currentSlide + 1, totalSlides);
+        }
+        
+        // Next slide
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateCarousel();
+        }
+        
+        // Previous slide
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateCarousel();
+        }
+        
+        // Go to specific slide
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) {
+                currentSlide = index;
+                updateCarousel();
+            }
+        }
+        
+        // Event listeners for buttons
+        if (nextBtn) {
+            nextBtn.addEventListener('click', nextSlide);
+            nextBtn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    nextSlide();
+                }
+            });
+        }
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', prevSlide);
+            prevBtn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    prevSlide();
+                }
+            });
+        }
+        
+        // Event listeners for dots
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => goToSlide(index));
+            dot.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    goToSlide(index);
+                }
+            });
+        });
+        
+        // Keyboard navigation for carousel
+        carousel.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key >= '1' && e.key <= '9') {
+                const num = parseInt(e.key) - 1;
+                if (num < totalSlides) {
+                    e.preventDefault();
+                    goToSlide(num);
+                }
+            }
+        });
+        
+        // Auto-advance carousel (optional)
+        let autoAdvanceInterval;
+        function startAutoAdvance() {
+            autoAdvanceInterval = setInterval(nextSlide, 5000);
+        }
+        
+        function stopAutoAdvance() {
+            clearInterval(autoAdvanceInterval);
+        }
+        
+        // Start auto-advance on mouse leave, stop on hover
+        carousel.addEventListener('mouseenter', stopAutoAdvance);
+        carousel.addEventListener('mouseleave', startAutoAdvance);
+        
+        // Start auto-advance initially
+        startAutoAdvance();
+        
+        // Initialize carousel
+        updateCarousel();
+    });
+}
+
+function announceSlideChange(current, total) {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.setAttribute('aria-atomic', 'true');
+    announcement.classList.add('sr-only');
+    announcement.textContent = `Image ${current} of ${total}`;
     
     document.body.appendChild(announcement);
     
