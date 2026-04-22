@@ -367,28 +367,72 @@ function showFormMessage(message, type) {
 }
 
 /**
- * Media Cards
+ * Video Modal System
  */
 function initMediaCards() {
     const playButtons = document.querySelectorAll('.play-btn');
     const videoCards = document.querySelectorAll('.video-card');
+    const modal = document.getElementById('video-modal');
+    const modalVideo = document.getElementById('modal-video');
+    const modalTitle = document.getElementById('video-modal-title');
+    const modalClose = document.querySelector('.video-modal-close');
+    
+    // Initialize modal
+    if (!modal || !modalVideo) return;
+    
+    // Function to open modal with video
+    function openModal(videoElement, title) {
+        // Set video source
+        const source = videoElement.querySelector('source');
+        if (source) {
+            modalVideo.innerHTML = '';
+            const newSource = document.createElement('source');
+            newSource.src = source.src;
+            newSource.type = source.type;
+            modalVideo.appendChild(newSource);
+        }
+        
+        // Set poster
+        modalVideo.poster = videoElement.poster;
+        
+        // Set title
+        if (title) {
+            modalTitle.textContent = title;
+        }
+        
+        // Show modal
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        
+        // Load and play video
+        modalVideo.load();
+        setTimeout(() => {
+            modalVideo.play().catch(e => console.log('Autoplay prevented:', e));
+        }, 100);
+        
+        // Focus close button for accessibility
+        setTimeout(() => {
+            modalClose.focus();
+        }, 200);
+    }
+    
+    // Function to close modal
+    function closeModal() {
+        modalVideo.pause();
+        modalVideo.currentTime = 0;
+        modal.hidden = true;
+        document.body.style.overflow = '';
+    }
     
     // Add click handlers for video play buttons
     playButtons.forEach(button => {
         button.addEventListener('click', function() {
             const card = this.closest('.video-card');
             const video = card.querySelector('video');
+            const title = card.querySelector('.media-title')?.textContent || 'Video';
             
             if (video) {
-                if (video.paused) {
-                    video.play();
-                    this.textContent = '⏸';
-                    this.setAttribute('aria-label', 'Pause video');
-                } else {
-                    video.pause();
-                    this.textContent = '▶';
-                    this.setAttribute('aria-label', 'Play video');
-                }
+                openModal(video, title);
             }
         });
         
@@ -399,6 +443,31 @@ function initMediaCards() {
                 this.click();
             }
         });
+    });
+    
+    // Close modal events
+    if (modalClose) {
+        modalClose.addEventListener('click', closeModal);
+        
+        modalClose.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                closeModal();
+            }
+        });
+    }
+    
+    // Close modal on overlay click
+    const modalOverlay = document.querySelector('.video-modal-overlay');
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', closeModal);
+    }
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !modal.hidden) {
+            closeModal();
+        }
     });
     
     // Add hover effects for media cards
@@ -416,33 +485,6 @@ function initMediaCards() {
                 playBtn.style.transform = 'translate(-50%, -50%)';
             }
         });
-        
-        // Handle video state changes
-        const video = card.querySelector('video');
-        if (video) {
-            const playBtn = card.querySelector('.play-btn');
-            
-            video.addEventListener('play', function() {
-                if (playBtn) {
-                    playBtn.textContent = '⏸';
-                    playBtn.setAttribute('aria-label', 'Pause video');
-                }
-            });
-            
-            video.addEventListener('pause', function() {
-                if (playBtn) {
-                    playBtn.textContent = '▶';
-                    playBtn.setAttribute('aria-label', 'Play video');
-                }
-            });
-            
-            video.addEventListener('ended', function() {
-                if (playBtn) {
-                    playBtn.textContent = '▶';
-                    playBtn.setAttribute('aria-label', 'Play video');
-                }
-            });
-        }
     });
 }
 

@@ -200,11 +200,6 @@
                     <article class="project-card" data-category="ai systems">
                         <div class="project-image">
                             <img src="assets/media/aca-mozart-ee-ai/mozart.jpg" alt="ACA_Mozart EE Ai Project Preview" class="project-preview-img">
-                            <div class="project-image-gallery">
-                                <img src="assets/media/aca-mozart-ee-ai/architecture.jpg" alt="Architecture diagram" class="gallery-thumb">
-                                <img src="assets/media/aca-mozart-ee-ai/ci-cd.jpg" alt="CI/CD pipeline" class="gallery-thumb">
-                                <img src="assets/media/aca-mozart-ee-ai/database.jpg" alt="Database schema" class="gallery-thumb">
-                            </div>
                         </div>
                         <div class="project-content">
                             <h3 class="project-title">ACA_Mozart EE Ai</h3>
@@ -243,11 +238,6 @@
                     <article class="project-card" data-category="ai">
                         <div class="project-image">
                             <img src="assets/media/sigma-alpha/sigma-alpha.jpg" alt="Sigma-Alpha Project Preview" class="project-preview-img">
-                            <div class="project-image-gallery">
-                                <img src="assets/media/sigma-alpha/ci-cd.jpg" alt="CI/CD pipeline" class="gallery-thumb">
-                                <img src="assets/media/sigma-alpha/database.jpg" alt="Database schema" class="gallery-thumb">
-                                <img src="assets/media/sigma-alpha/pr.jpg" alt="PR workflow" class="gallery-thumb">
-                            </div>
                         </div>
                         <div class="project-content">
                             <h3 class="project-title">Sigma-Alpha</h3>
@@ -440,6 +430,24 @@
             </div>
         </div>
     </footer>
+
+    <!-- Video Modal -->
+    <div id="video-modal" class="video-modal" hidden>
+        <div class="video-modal-overlay"></div>
+        <div class="video-modal-container">
+            <div class="video-modal-header">
+                <h3 class="video-modal-title" id="video-modal-title">Video</h3>
+                <button class="video-modal-close" aria-label="Close video">
+                    <span class="close-icon">×</span>
+                </button>
+            </div>
+            <div class="video-modal-content">
+                <video id="modal-video" class="modal-video" controls>
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
 
     <!-- JavaScript -->
     <script src="script.js"></script>
