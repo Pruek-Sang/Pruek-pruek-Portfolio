@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initForm();
     initCurrentYear();
     initMediaCards();
+    initProjectToggle();
     
     // Add keyboard navigation support
     initKeyboardNavigation();
@@ -217,8 +218,9 @@ function initProjectFilter() {
             // Filter projects
             projectCards.forEach(card => {
                 const category = card.getAttribute('data-category');
+                const categories = category ? category.split(' ') : [];
                 
-                if (filter === 'all' || category === filter) {
+                if (filter === 'all' || categories.includes(filter)) {
                     card.style.display = 'block';
                     
                     // Add fade-in animation
@@ -253,9 +255,8 @@ function initProjectFilter() {
 function announceFilterChange(filter) {
     const filterNames = {
         'all': 'All Projects',
-        'web': 'Web Development',
-        'systems': 'Systems',
-        'ai': 'AI & ML'
+        'ai': 'AI Systems',
+        'systems': 'System Architecture'
     };
     
     const announcement = document.createElement('div');
@@ -376,24 +377,18 @@ function initMediaCards() {
     playButtons.forEach(button => {
         button.addEventListener('click', function() {
             const card = this.closest('.video-card');
-            const placeholder = card.querySelector('.preview-placeholder');
+            const video = card.querySelector('video');
             
-            // In a real implementation, this would load and play the actual video
-            // For now, we'll just show a message
-            if (placeholder) {
-                const originalText = placeholder.innerHTML;
-                placeholder.innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 24px; margin-bottom: 10px;">🎬</div>
-                        <div>Video playback would start here</div>
-                        <small>Replace with actual video player</small>
-                    </div>
-                `;
-                
-                // Reset after 3 seconds
-                setTimeout(() => {
-                    placeholder.innerHTML = originalText;
-                }, 3000);
+            if (video) {
+                if (video.paused) {
+                    video.play();
+                    this.textContent = '⏸';
+                    this.setAttribute('aria-label', 'Pause video');
+                } else {
+                    video.pause();
+                    this.textContent = '▶';
+                    this.setAttribute('aria-label', 'Play video');
+                }
             }
         });
         
@@ -421,7 +416,95 @@ function initMediaCards() {
                 playBtn.style.transform = 'translate(-50%, -50%)';
             }
         });
+        
+        // Handle video state changes
+        const video = card.querySelector('video');
+        if (video) {
+            const playBtn = card.querySelector('.play-btn');
+            
+            video.addEventListener('play', function() {
+                if (playBtn) {
+                    playBtn.textContent = '⏸';
+                    playBtn.setAttribute('aria-label', 'Pause video');
+                }
+            });
+            
+            video.addEventListener('pause', function() {
+                if (playBtn) {
+                    playBtn.textContent = '▶';
+                    playBtn.setAttribute('aria-label', 'Play video');
+                }
+            });
+            
+            video.addEventListener('ended', function() {
+                if (playBtn) {
+                    playBtn.textContent = '▶';
+                    playBtn.setAttribute('aria-label', 'Play video');
+                }
+            });
+        }
     });
+}
+
+/**
+ * Project Toggle Functionality
+ */
+function initProjectToggle() {
+    const toggleButtons = document.querySelectorAll('.project-toggle');
+    
+    toggleButtons.forEach(button => {
+        const targetId = button.getAttribute('aria-controls');
+        const target = document.getElementById(targetId);
+        
+        if (!target) return;
+        
+        // Set initial state
+        button.setAttribute('aria-expanded', 'false');
+        target.hidden = true;
+        
+        // Toggle on click
+        button.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            const newState = !isExpanded;
+            
+            this.setAttribute('aria-expanded', newState.toString());
+            target.hidden = !newState;
+            
+            // Update button text
+            const toggleText = this.querySelector('.toggle-text');
+            if (toggleText) {
+                toggleText.textContent = newState ? 'Hide Details' : 'View Details';
+            }
+            
+            // Announce for screen readers
+            announceToggle(newState, targetId);
+        });
+        
+        // Add keyboard support
+        button.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+    });
+}
+
+function announceToggle(isExpanded, targetId) {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.setAttribute('aria-atomic', 'true');
+    announcement.classList.add('sr-only');
+    announcement.textContent = isExpanded 
+        ? `Project details expanded` 
+        : `Project details collapsed`;
+    
+    document.body.appendChild(announcement);
+    
+    // Remove after announcement
+    setTimeout(() => {
+        document.body.removeChild(announcement);
+    }, 1000);
 }
 
 /**

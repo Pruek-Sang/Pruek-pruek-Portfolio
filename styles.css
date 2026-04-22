@@ -662,6 +662,90 @@ a:hover {
     gap: var(--spacing-md);
 }
 
+/* Project Toggle Button */
+.project-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-weight: 600;
+    color: var(--color-primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--spacing-sm) 0;
+    font-family: var(--font-primary);
+    font-size: var(--text-base);
+    transition: gap var(--transition-fast);
+}
+
+.project-toggle:hover {
+    gap: var(--spacing-md);
+}
+
+.project-toggle[aria-expanded="true"] .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.toggle-icon {
+    transition: transform var(--transition-fast);
+    display: inline-block;
+}
+
+/* Project Details */
+.project-details {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-border);
+    animation: fadeIn var(--transition-normal);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.details-content {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.details-content ul {
+    margin: var(--spacing-md) 0;
+    padding-left: var(--spacing-lg);
+}
+
+.details-content li {
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Project Image Gallery */
+.project-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.project-image-gallery {
+    display: flex;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs);
+    background: rgba(0, 0, 0, 0.2);
+    justify-content: center;
+}
+
+.gallery-thumb {
+    width: 60px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    border: 2px solid transparent;
+    transition: border-color var(--transition-fast);
+}
+
+.gallery-thumb:hover {
+    border-color: var(--color-primary);
+}
+
 /* Media Section */
 .media-grid {
     display: grid;
@@ -689,6 +773,13 @@ a:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+}
+
+.video-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .preview-placeholder {
